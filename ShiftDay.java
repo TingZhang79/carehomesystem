@@ -6,8 +6,8 @@ public class ShiftDay {
     Calendar day;
 
     ShiftDay(){
-       startTime = Calendar.getInstance();
-       endTime = Calendar.getInstance();
-       day = Calendar.getInstance();
+        startTime = Calendar.getInstance();
+        endTime = Calendar.getInstance();
+        day = Calendar.getInstance();
     }
 }

@@ -3,6 +3,11 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
+
 public class Manager extends Staff{
 
     Manager(String username,String password){
@@ -108,30 +113,7 @@ public class Manager extends Staff{
             System.out.println(e.getMessage());
         }
     }
-    public void CheckCompliance(MedicalWorkers worker) {
-        try {
-            if (worker.shiftDay.size() > 14)
-                throw new UnreasonableShiftException();
-            Map<Calendar,Float> ShiftHours = new HashMap<Calendar,Float>();
-            float hour = 0.0f;
-            for (ShiftDay tempShiftDay : worker.shiftDay){
-                if (ShiftHours.containsKey(tempShiftDay.day)){
-                    hour = hour + tempShiftDay.endTime.get(Calendar.HOUR_OF_DAY)-tempShiftDay.startTime.get(Calendar.HOUR_OF_DAY) + ((float)tempShiftDay.endTime.get(Calendar.MINUTE) - (float)tempShiftDay.startTime.get(Calendar.MINUTE))/60;
-                    ShiftHours.put(tempShiftDay.day,ShiftHours.get(tempShiftDay.day) + hour);
-                }
-                else{
-                    hour = tempShiftDay.endTime.get(Calendar.HOUR_OF_DAY)-tempShiftDay.startTime.get(Calendar.HOUR_OF_DAY) + ((float)tempShiftDay.endTime.get(Calendar.MINUTE) - (float)tempShiftDay.startTime.get(Calendar.MINUTE))/60;
-                    ShiftHours.put(tempShiftDay.day,hour);
-                }
-            }
-            for (Map.Entry<Calendar,Float> entry : ShiftHours.entrySet()){
-                if (entry.getValue() > 8)
-                    throw new UnreasonableShiftException();
-            }
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-        }
-    }
+
     public void updateShift(MedicalWorkers worker,int oldYear, int oldMonth,int oldDay,int oldStartHour,int oldStartMin,int oldEndHour,int oldEndMin,int Year,int Month,int Day,int startHour,int startMin,int endHour,int endMin){
         try {
             if (!this.isAuthoized)
