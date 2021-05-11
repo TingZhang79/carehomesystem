@@ -171,10 +171,18 @@ public class AbleCareHome {
                 int endMin = this.scanner.nextInt();
                 switch (choice_str.split("")[0]) {
                     case "0":
-                        manager1.allocateShift(this.nurses.get(Integer.parseInt(choice_str.split("")[1])),Year,Month,Day,startHour,startMin,endHour,endMin);
+                        try {
+                            manager1.allocateShift(this.nurses.get(Integer.parseInt(choice_str.split("")[1])), Year, Month, Day, startHour, startMin, endHour, endMin);
+                        }catch (Exception e){
+                            System.out.println(e.getMessage());
+                        }
                         break;
                     case "1":
-                        manager1.allocateShift(this.doctors.get(Integer.parseInt(choice_str.split("")[1])),Year,Month,Day,startHour,startMin,endHour,endMin);
+                        try {
+                            manager1.allocateShift(this.doctors.get(Integer.parseInt(choice_str.split("")[1])), Year, Month, Day, startHour, startMin, endHour, endMin);
+                        }catch (Exception e){
+                            System.out.println(e.getMessage());
+                        }
                         break;
                 }
 
@@ -218,7 +226,11 @@ public class AbleCareHome {
                         System.out.print("Input endMin:");
                         endMin = this.scanner.nextInt();
                         ShiftDay tempShiftDay = this.nurses.get(Integer.parseInt(choice_str.split("")[1])).shiftDay.get(choice);
-                        manager1.updateShift(this.nurses.get(Integer.parseInt(choice_str.split("")[1])),tempShiftDay.day.get(Calendar.YEAR),tempShiftDay.day.get(Calendar.MONTH),tempShiftDay.day.get(Calendar.DAY_OF_MONTH),tempShiftDay.startTime.get(Calendar.HOUR_OF_DAY),tempShiftDay.startTime.get(Calendar.MINUTE),tempShiftDay.endTime.get(Calendar.HOUR_OF_DAY),tempShiftDay.endTime.get(Calendar.MINUTE),Year,Month,Day,startHour,startMin,endHour,endMin);
+                        try {
+                            manager1.updateShift(this.nurses.get(Integer.parseInt(choice_str.split("")[1])), tempShiftDay.day.get(Calendar.YEAR), tempShiftDay.day.get(Calendar.MONTH), tempShiftDay.day.get(Calendar.DAY_OF_MONTH), tempShiftDay.startTime.get(Calendar.HOUR_OF_DAY), tempShiftDay.startTime.get(Calendar.MINUTE), tempShiftDay.endTime.get(Calendar.HOUR_OF_DAY), tempShiftDay.endTime.get(Calendar.MINUTE), Year, Month, Day, startHour, startMin, endHour, endMin);
+                        }catch (Exception e){
+                            System.out.println(e.getMessage());
+                        }
                         break;
                     case "1":
                         for (ShiftDay shiftDay : this.doctors.get(Integer.parseInt(choice_str.split("")[1])).shiftDay){
@@ -242,7 +254,11 @@ public class AbleCareHome {
                         System.out.print("Input endMin:");
                         endMin = this.scanner.nextInt();
                         tempShiftDay = this.nurses.get(Integer.parseInt(choice_str.split("")[1])).shiftDay.get(choice);
-                        manager1.updateShift(this.nurses.get(Integer.parseInt(choice_str.split("")[1])),tempShiftDay.day.get(Calendar.YEAR),tempShiftDay.day.get(Calendar.MONTH),tempShiftDay.day.get(Calendar.DAY_OF_MONTH),tempShiftDay.startTime.get(Calendar.HOUR_OF_DAY),tempShiftDay.startTime.get(Calendar.MINUTE),tempShiftDay.endTime.get(Calendar.HOUR_OF_DAY),tempShiftDay.endTime.get(Calendar.MINUTE),Year,Month,Day,startHour,startMin,endHour,endMin);
+                        try {
+                            manager1.updateShift(this.nurses.get(Integer.parseInt(choice_str.split("")[1])), tempShiftDay.day.get(Calendar.YEAR), tempShiftDay.day.get(Calendar.MONTH), tempShiftDay.day.get(Calendar.DAY_OF_MONTH), tempShiftDay.startTime.get(Calendar.HOUR_OF_DAY), tempShiftDay.startTime.get(Calendar.MINUTE), tempShiftDay.endTime.get(Calendar.HOUR_OF_DAY), tempShiftDay.endTime.get(Calendar.MINUTE), Year, Month, Day, startHour, startMin, endHour, endMin);
+                        }catch (Exception e){
+                            System.out.println(e.getMessage());
+                        }
                         break;
                 }
 

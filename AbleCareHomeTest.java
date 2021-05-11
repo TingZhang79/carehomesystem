@@ -66,23 +66,36 @@ public class AbleCareHomeTest {
     }
     @Test
     public void attachShiftTest(){
-        Manager manager1 = (Manager) ableCareHome.Login("Manager","manager1","1111");
-        manager1.allocateShift(ableCareHome.nurses.get(0),2021,5,1,8,0,16,0);
-        assertEquals(ableCareHome.nurses.get(0).shiftDay.get(0).endTime.get(Calendar.HOUR_OF_DAY),16);
-        assertEquals(ableCareHome.nurses.get(0).shiftDay.get(0).endTime.get(Calendar.MINUTE),0);
+        try {
+            Manager manager1 = (Manager) ableCareHome.Login("Manager", "manager1", "1111");
+            manager1.allocateShift(ableCareHome.nurses.get(0), 2021, 5, 1, 8, 0, 16, 0);
+            assertEquals(ableCareHome.nurses.get(0).shiftDay.get(0).endTime.get(Calendar.HOUR_OF_DAY), 16);
+            assertEquals(ableCareHome.nurses.get(0).shiftDay.get(0).endTime.get(Calendar.MINUTE), 0);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
     }
     @Test
     public void checkShiftTest(){
-        Manager manager1 = (Manager) ableCareHome.Login("Manager","manager1","1111");
-        manager1.allocateShift(ableCareHome.nurses.get(0),2021,5,1,8,0,16,30);
+        try {
+            Manager manager1 = (Manager) ableCareHome.Login("Manager", "manager1", "1111");
+            manager1.allocateShift(ableCareHome.nurses.get(0), 2021, 5, 1, 8, 0, 13, 0);
+            manager1.allocateShift(ableCareHome.nurses.get(0), 2021, 5, 1, 13, 0, 16, 30);
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 
     @Test
     public void updateShiftTest(){
-        Manager manager1 = (Manager) ableCareHome.Login("Manager","manager1","1111");
-        manager1.allocateShift(ableCareHome.nurses.get(0),2021,5,1,8,0,16,0);
-        manager1.updateShift(ableCareHome.nurses.get(0),2021,5,1,8,0,16,0,2021,5,1,8,0,15,0);
-        assertEquals(ableCareHome.nurses.get(0).shiftDay.get(0).endTime.get(Calendar.MINUTE),0);
+        try {
+            Manager manager1 = (Manager) ableCareHome.Login("Manager","manager1","1111");
+            manager1.allocateShift(ableCareHome.nurses.get(0),2021,5,1,8,0,16,0);
+            manager1.updateShift(ableCareHome.nurses.get(0),2021,5,1,8,0,16,0,2021,5,1,8,0,15,0);
+            assertEquals(ableCareHome.nurses.get(0).shiftDay.get(0).endTime.get(Calendar.MINUTE),0);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
     }
     @Test
     public void checkDetailTest(){
