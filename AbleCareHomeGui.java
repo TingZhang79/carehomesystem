@@ -15,7 +15,6 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.Scanner;
 
 public class AbleCareHomeGui extends Application {
 
@@ -47,6 +46,7 @@ public class AbleCareHomeGui extends Application {
         gridPane.add(addPatientBtn, 0, 3);
         gridPane.add(changeNursePassBtn, 0, 4);
         gridPane.add(changeDoctorPassBtn, 0, 5);
+        gridPane.add(logout, 0, 6);
         addNursebtn.setOnMouseClicked(event -> {
             AddNursePage();
         });
@@ -64,6 +64,11 @@ public class AbleCareHomeGui extends Application {
         });
         addPatientBtn.setOnMouseClicked(event -> {
             addPatient();
+        });
+        logout.setOnMouseClicked(event -> {
+            stage.close();
+            Logout(this.manager);
+            this.manager = null;
         });
         Scene scene = new Scene(gridPane, 500, 800);
         stage.setScene(scene);
@@ -504,13 +509,13 @@ public class AbleCareHomeGui extends Application {
                     break;
                 }
             }
-            if (patientExist){
+            if (patientExist) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Notice");
                 alert.setHeaderText("Error");
                 alert.setContentText("The patient is already existed");
                 alert.show();
-            }else {
+            } else {
                 Sex sex = sexCombo.getSelectionModel().getSelectedItem().equals("Male") ? Sex.Male : Sex.Female;
                 boolean Isolation = needIsolation.getSelectionModel().getSelectedItem().equals("True") ? true : false;
                 StageManager.ableCareHome.addPatient(patientName, sex, Isolation);
@@ -524,6 +529,16 @@ public class AbleCareHomeGui extends Application {
         Scene scene = new Scene(gridPane, 500, 500);
         stage.setScene(scene);
         stage.show();
+    }
+
+    public void Logout(Staff staff) {
+        Stage stage = new Stage();
+        staff.isAuthoized = false;
+        try {
+            Login(stage);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public void Login(Stage primaryStage) throws IOException {
@@ -580,10 +595,6 @@ public class AbleCareHomeGui extends Application {
             Staff staff = StageManager.ableCareHome.Login(userType, usernameText.getText(), passwordText.getText());
             if (staff != null) {
                 primaryStage.close();
-                if (userType.equals("Nurse") || userType.equals("Doctor")) {
-                    WardPage();
-                } else
-                    ManagerPage();
                 switch (userType) {
                     case "Nurse":
                         this.nurse = (Nurse) staff;
@@ -603,6 +614,10 @@ public class AbleCareHomeGui extends Application {
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
+                if (userType.equals("Nurse") || userType.equals("Doctor")) {
+                    WardPage();
+                } else
+                    ManagerPage();
             } else {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Notice");
@@ -641,22 +656,195 @@ public class AbleCareHomeGui extends Application {
                     for (int x = 0, bedIndex = 0; x < 2; ++x) {
                         for (int y = 0; y < 2; ++y) {
                             GridPane gridPane1 = new GridPane();
-                            gridPane1.setStyle("-fx-background-color: white;-fx-border-color:#3498db;-fx-border-width:3px");
+                            Bed finalBed = StageManager.ableCareHome.wards.get(temp).rooms.get(roomIndex).Beds.get(bedIndex);
+                            if (finalBed.patient != null)
+                                if (finalBed.patient.sex == Sex.Male)
+                                    gridPane1.setStyle("-fx-background-color: blue;-fx-border-color:#3498db;-fx-border-width:3px");
+                                else {
+                                    if (finalBed.patient.sex == Sex.Female) {
+                                        gridPane1.setStyle("-fx-background-color: red;-fx-border-color:#3498db;-fx-border-width:3px");
+                                    }
+                                }
+                            else {
+                                gridPane1.setStyle("-fx-background-color: white;-fx-border-color:#3498db;-fx-border-width:3px");
+                            }
                             gridPane1.setMinWidth(50);
                             gridPane1.setMinHeight(50);
                             gridPane1.setHgap(20);
                             gridPane1.setVgap(15);
-                            Bed finalBed = StageManager.ableCareHome.wards.get(temp).rooms.get(roomIndex).Beds.get(bedIndex);
+                            int finalTemp = temp;
+                            int finalRoomIndex = roomIndex;
+                            int finalBedIndex = bedIndex;
                             gridPane1.setOnMouseClicked(event -> {
-                                Stage stage = new Stage();
-                                GridPane gridPane2 = new GridPane();
-                                gridPane2.add(new Label(finalBed.ID), 1, 1);
-                                gridPane2.add(new Label("test"), 1, 2);
-                                gridPane2.setAlignment(Pos.CENTER);
-                                Scene scene = new Scene(gridPane2, 800, 500);
-                                stage.setScene(scene);
-                                stage.initModality(Modality.APPLICATION_MODAL);
-                                stage.show();
+                                //Nurse Page
+                                if (this.nurse != null) {
+                                    Stage stage = new Stage();
+                                    GridPane gridPane2 = new GridPane();
+                                    gridPane2.setAlignment(Pos.CENTER);
+                                    gridPane2.setVgap(30);
+                                    gridPane2.setHgap(30);
+
+                                    ComboBox patientCombo = new ComboBox();
+                                    for (Patient patient : StageManager.ableCareHome.patients)
+                                        patientCombo.getItems().add(patient.ID + " " + patient.name);
+
+                                    //When bed don't have patient button will show
+                                    Button button = new Button("Add patient to Bed");
+                                    button.setOnMouseClicked(event1 -> {
+                                        outer:
+                                        for (Patient patient : StageManager.ableCareHome.patients)
+                                            if ((patient.ID + " " + patient.name).equals(patientCombo.getSelectionModel().getSelectedItem())) {
+                                                for (Ward ward : StageManager.ableCareHome.wards)
+                                                    for (Room room : ward.rooms)
+                                                        for (Bed bed : room.Beds)
+                                                            if (bed.patient != null)
+                                                                if (bed.patient.equals(patient)) {
+                                                                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                                                                    alert.setTitle("Notice");
+                                                                    alert.setHeaderText("Error");
+                                                                    alert.setContentText("The patient is already has bed");
+                                                                    alert.show();
+                                                                    break outer;
+                                                                }
+                                                this.nurse.AddToBed(patient, StageManager.ableCareHome.wards.get(finalTemp).rooms.get(finalRoomIndex).Beds.get(finalBedIndex));
+                                                stage.close();
+                                                primaryStage.close();
+                                                WardPage();
+                                            }
+                                    });
+
+                                    if (finalBed.patient == null && this.nurse != null) {
+                                        gridPane2.add(patientCombo, 0, 2);
+                                        gridPane2.add(button, 1, 2);
+                                    } else {
+                                        gridPane2.add(new Label(finalBed.ID), 0, 0);
+                                        gridPane2.add(new Label("Patient: " + finalBed.patient.ID + " " + finalBed.patient.name + " " + ((finalBed.patient.sex == Sex.Male) ? "Male" : "FeMale")), 0, 1);
+                                        gridPane2.add(new Label("Need Isolation: " +(finalBed.patient.needIsolation ? "True" : "False")), 0, 2);
+                                        gridPane2.add(new Label("Prescription Worker ID: " + finalBed.prescription.workerID), 0, 3);
+                                        Button administerPreBtn = new Button("Administer Prescription");
+                                        ListView medicines = new ListView();
+                                        ObservableList<String> list = FXCollections.observableArrayList();
+
+
+                                        gridPane2.add(medicines,0,4);
+                                        administerPreBtn.setOnMouseClicked(event1 -> {
+                                            try {
+                                                list.clear();
+                                                Prescription prescription = this.nurse.AdministerPrescritpion(StageManager.ableCareHome.wards, finalBed.patient.ID);
+                                                for (Medicine medicine : prescription.medicines)
+                                                    list.add(medicine.name + " " + medicine.doseAmt + " times a day " + "one time " + medicine.doseUnit);
+                                            }catch (AccessDeniedException e){
+                                                System.out.println(e.getMessage());
+                                            }
+                                        });
+                                        medicines.setItems(list);
+                                        gridPane2.add(administerPreBtn,1,0);
+
+                                        VBox vBox = new VBox();
+                                        vBox.setSpacing(30);
+                                        vBox.setAlignment(Pos.CENTER);
+                                        ComboBox comboBox = new ComboBox();
+                                        for (Ward ward : StageManager.ableCareHome.wards)
+                                            for (Room room : ward.rooms)
+                                                for (Bed bed : room.Beds)
+                                                    comboBox.getItems().add(bed.ID);
+                                        vBox.getChildren().add(comboBox);
+                                        Button changeBed = new Button("Change Bed");
+                                        changeBed.setOnMouseClicked(event1 -> {
+                                            outer:
+                                            for (Ward ward : StageManager.ableCareHome.wards)
+                                                for (Room room : ward.rooms)
+                                                    for (Bed bed : room.Beds) {
+                                                        if (bed.ID.equals(comboBox.getSelectionModel().getSelectedItem())) {
+                                                            if (bed.patient == null) {
+                                                                this.nurse.ChangeBed(finalBed.patient, finalBed, bed);
+                                                                stage.close();
+                                                                primaryStage.close();
+                                                                WardPage();
+                                                                break outer;
+                                                            }
+                                                        }
+                                                    }
+                                        });
+                                        vBox.getChildren().add(changeBed);
+                                        gridPane2.add(vBox,1,1);
+                                    }
+
+                                    Scene scene = new Scene(gridPane2, 1000, 800);
+                                    stage.setScene(scene);
+                                    stage.initModality(Modality.APPLICATION_MODAL);
+                                    stage.show();
+                                }else
+                                    //Doctor Page
+                                    if (this.doctor != null){
+                                        Stage stage = new Stage();
+                                        GridPane doctorGrid = new GridPane();
+                                        doctorGrid.setAlignment(Pos.CENTER);
+                                        doctorGrid.setVgap(30);
+                                        doctorGrid.setHgap(20);
+                                        if (finalBed.patient != null) {
+                                            doctorGrid.add(new Label("Patient: " + finalBed.patient.ID + " " + finalBed.patient.name + " " + ((finalBed.patient.sex == Sex.Male) ? "Male" : "FeMale")), 0, 1);
+                                            doctorGrid.add(new Label("Need Isolation: " + (finalBed.patient.needIsolation ? "True" : "False")), 0, 2);
+                                            doctorGrid.add(new Label("Prescription Worker ID: " + finalBed.prescription.workerID), 0, 3);
+
+                                            ListView medicines = new ListView();
+                                            ObservableList<String> list = FXCollections.observableArrayList();
+                                            Button checkDetailBtn = new Button("Check Detail");
+                                            checkDetailBtn.setOnMouseClicked(event1 -> {
+                                                list.clear();
+                                                Prescription prescription = this.doctor.CheckDetail(StageManager.ableCareHome.wards, finalBed.patient.ID);
+                                                for (Medicine medicine : prescription.medicines)
+                                                    list.add(medicine.name + " " + medicine.doseAmt + " times a day " + "one time " + medicine.doseUnit);
+                                            });
+                                            medicines.setItems(list);
+                                            doctorGrid.add(medicines,0,4);
+
+
+                                            TextField medicineNameText = new TextField();
+                                            medicineNameText.setPromptText("medicine name ");
+                                            TextField doseAmtText = new TextField();
+                                            doseAmtText.setPromptText("medicine doseAmt");
+                                            TextField doseUnitText = new TextField();
+                                            doseUnitText.setPromptText("medicine doseUnit");
+                                            VBox vBox = new VBox();
+                                            vBox.setAlignment(Pos.TOP_LEFT);
+                                            vBox.setSpacing(30);
+
+                                            vBox.getChildren().add(medicineNameText);
+                                            vBox.getChildren().add(doseAmtText);
+                                            vBox.getChildren().add(doseUnitText);
+                                            vBox.getChildren().add(checkDetailBtn);
+
+                                            Button attachPreBtn = new Button("attach Prescription");
+                                            attachPreBtn.setOnMouseClicked(event1 -> {
+                                                this.doctor.attachPrescription(finalBed,medicineNameText.getText(),Integer.parseInt(doseAmtText.getText()),doseUnitText.getText());
+                                                list.add(medicineNameText.getText() + " " + doseAmtText.getText() + " times a day " + "one time " + doseUnitText.getText());
+                                            });
+                                            vBox.getChildren().add(attachPreBtn);
+
+                                            Button removePreBtn = new Button("remove Prescription");
+                                            removePreBtn.setOnMouseClicked(event1 -> {
+                                                String medicineName = medicines.getSelectionModel().getSelectedItem().toString().split(" ")[0];
+                                                System.out.println(medicineName);
+                                                this.doctor.removePrescription(finalBed,medicineName);
+                                                list.remove(medicines.getSelectionModel().getSelectedItem());
+                                            });
+                                            vBox.getChildren().add(removePreBtn);
+
+                                            Button updatePreBtn = new Button("update Prescription");
+                                            updatePreBtn.setOnMouseClicked(event1 -> {
+                                                String medicineName = medicines.getSelectionModel().getSelectedItem().toString().split(" ")[0];
+                                                this.doctor.updatePrescription(finalBed,medicineName,Integer.parseInt(doseAmtText.getText()),doseUnitText.getText());
+                                                list.set(medicines.getSelectionModel().getSelectedIndex(),medicineName + " " + doseAmtText.getText() + " times a day " + "one time " + doseUnitText.getText());
+                                            });
+                                            vBox.getChildren().add(updatePreBtn);
+                                            doctorGrid.add(vBox,1,4);
+                                        }
+//                                        doctorGrid.add(new Label("test"),0,0);
+                                        Scene scene = new Scene(doctorGrid,800,700);
+                                        stage.setScene(scene);
+                                        stage.show();
+                                    }
                             });
                             bedIndex++;
                             gridPane.add(gridPane1, y, x);
@@ -670,7 +858,20 @@ public class AbleCareHomeGui extends Application {
             label1.setFont(Font.font(30));
             root.add(label1, temp, 0);
         }
-        Scene scene = new Scene(root, 1200, 1080);
+        Button logoutBtn = new Button("Logout");
+        logoutBtn.setOnMouseClicked(event -> {
+            primaryStage.close();
+            try {
+                this.nurse = null;
+                this.doctor = null;
+                this.manager = null;
+                Login(primaryStage);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        });
+        root.add(logoutBtn, 1, 2);
+        Scene scene = new Scene(root, 1500, 1080);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
