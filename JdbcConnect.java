@@ -34,7 +34,28 @@ public class JdbcConnect {
                 return false;
             else
                 return true;
+        }catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return false;
+    }
+
+    public ResultSet resultSearch(String sql){
+        ResultSet result = null;
+        try {
+            result = statement.executeQuery(sql);
         }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        return result;
+    }
+
+    public boolean updateData(String sql){
+        try {
+            int rowNum = statement.executeUpdate(sql);
+            if(rowNum != 0)
+                return true;
+        }catch (Exception e) {
             System.out.println(e.getMessage());
         }
         return false;

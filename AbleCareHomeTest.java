@@ -1,15 +1,20 @@
 import org.junit.Before;
 import org.junit.Test;
 
+import java.sql.SQLException;
 import java.util.Calendar;
 
 import static org.junit.Assert.*;
 
 public class AbleCareHomeTest {
     AbleCareHome ableCareHome = new AbleCareHome();
+
+    public AbleCareHomeTest() throws SQLException {
+    }
+
     @Before
     public void before(){
-        Manager manager = new Manager("manager1","1111");
+        Manager manager = new Manager(3001,"manager1","1111");
         this.ableCareHome.managers.add(manager);
 
         ableCareHome.addPatient("patient1",Sex.Male,false);
@@ -91,7 +96,7 @@ public class AbleCareHomeTest {
         try {
             Manager manager1 = (Manager) ableCareHome.Login("Manager","manager1","1111");
             manager1.allocateShift(ableCareHome.nurses.get(0),2021,5,1,8,0,16,0);
-            manager1.updateShift(ableCareHome.nurses.get(0),2021,5,1,8,0,16,0,2021,5,1,8,0,15,0);
+            manager1.updateShift(ableCareHome.nurses.get(0),2021,5,1,8,0,16,0,2021,5,1,8,0,18,0);
             assertEquals(ableCareHome.nurses.get(0).shiftDay.get(0).endTime.get(Calendar.MINUTE),0);
         }catch (Exception e){
             System.out.println(e.getMessage());

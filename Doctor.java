@@ -16,6 +16,7 @@ public class Doctor extends MedicalWorkers{
                 bed.prescription.medicines.add(medicine);
                 bed.prescription.patientID = bed.patient.ID;
                 bed.prescription.workerID = this.ID;
+                StageManager.connect.updateData("insert into Prescription values("+bed.patient.ID+","+this.ID+",'"+name+"'"+",'"+doseAmt+"'"+",'"+doseUnit+"')");
                 Calendar cal = Calendar.getInstance();
                 LogAction("Doctor: "+ this.ID +" "+ this.username + " attach prescription:"+medicine.name + " to " + bed.ID + "->Patient:"+bed.patient.name,cal);
             }else
@@ -30,6 +31,7 @@ public class Doctor extends MedicalWorkers{
                 for (Medicine medicine : bed.prescription.medicines){
                     if (medicine.name.equals(medicineName)) {
                         bed.prescription.medicines.remove(medicine);
+                        StageManager.connect.updateData("delete from Prescription where patientID="+bed.patient.ID+" and medicineName='"+medicineName+"'");
                         Calendar cal = Calendar.getInstance();
                         LogAction("Doctor: "+ this.ID +" "+ this.username + " remove medicine from prescription:"+medicine.name + " to " + bed.ID + "->Patient:"+bed.patient.name,cal);
                         break;
@@ -49,6 +51,7 @@ public class Doctor extends MedicalWorkers{
                 if (medicine.name.equals(tarMedicineName)) {
                     medicine.doseAmt = doseAmt;
                     medicine.doseUnit = doseUnit;
+                    StageManager.connect.updateData("update Prescription set medicinedoseAmt='"+doseAmt+"',"+"medicinedoseUnit='"+doseUnit+"' where patientID="+bed.patient.ID+" and medicineName='"+tarMedicineName+"'");
                     Calendar cal = Calendar.getInstance();
                     LogAction("Nurse: "+this.ID + " update bed "+bed.ID+" Prescription  medicine name:"+tarMedicineName +" doseAmt:"+doseAmt+ " doseUnit:"+doseUnit,cal);
                     break;

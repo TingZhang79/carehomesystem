@@ -3,7 +3,8 @@ import java.util.Calendar;
 
 public class Manager extends Staff {
 
-    Manager(String username, String password) {
+    Manager(int id, String username, String password) {
+        this.ID = id;
         this.username = username;
         this.password = password;
     }
@@ -12,6 +13,7 @@ public class Manager extends Staff {
         try {
             if (this.isAuthoized) {
                 nurses.add(nurse);
+                StageManager.connect.updateData("insert into user values("+nurse.ID+",'"+nurse.username+"','"+nurse.password+"','nurse')");
                 Calendar cal = Calendar.getInstance();
                 LogAction("add Nurse ID:" + nurse.ID + " Username:" + username, cal);
             } else
@@ -25,6 +27,7 @@ public class Manager extends Staff {
         try {
             if (this.isAuthoized) {
                 doctors.add(doctor);
+                StageManager.connect.updateData("insert into user values("+doctor.ID+",'"+doctor.username+"','"+doctor.password+"','doctor')");
                 Calendar cal = Calendar.getInstance();
                 LogAction("add Doctor ID:" + doctor.ID + " Username:" + username, cal);
             } else
@@ -58,6 +61,7 @@ public class Manager extends Staff {
                 for (Nurse nurse : nurses) {
                     if (nurse.username.equals(username) && nurse.password.equals(oldPassword)) {
                         nurse.password = newPassword;
+                        StageManager.connect.updateData("update user set password='"+newPassword+"' where username='"+username+"' and usertype='nurse'");
                         Calendar cal = Calendar.getInstance();
                         LogAction("change Nurse Password ID:" + nurse.ID + " username:" + username, cal);
                     }
@@ -75,6 +79,7 @@ public class Manager extends Staff {
                 for (Doctor doctor : doctors) {
                     if (doctor.username.equals(username) && doctor.password.equals(oldPassword)) {
                         doctor.password = newPassword;
+                        StageManager.connect.updateData("update user set password='"+newPassword+"' where username='"+username+"' and usertype='doctor'");
                         Calendar cal = Calendar.getInstance();
                         LogAction("change Doctor Password ID:" + doctor.ID + " username:" + username, cal);
                     }
@@ -98,6 +103,7 @@ public class Manager extends Staff {
             worker.shiftDay.remove(shiftDay);
             throw new UnreasonableShiftException();
         } else {
+            StageManager.connect.updateData("insert into shifts values("+worker.ID+",'"+startHour+":"+startMin+"','"+endHour+":"+endMin+"','"+Year+"-"+Month+"-"+Day+"')");
             Calendar cal = Calendar.getInstance();
             LogAction("add Shift for worker:" + worker.ID + " shift:" + Year + "/" + Month + "/" + Day + " " + startHour + ":" + startMin + "  --->  " + endHour + ":" + endMin, cal);
         }
@@ -119,6 +125,7 @@ public class Manager extends Staff {
                                         break outer;
                                     }
         }
+        StageManager.connect.updateData("delete from shifts where id="+worker.ID+" and start_time='"+startHour+":"+startMin+"' and end_time='"+endHour+":"+endMin+"' and day='"+Year+"-"+Month+"-"+Day+"'");
         Calendar cal = Calendar.getInstance();
         LogAction("delete Shift from worker:" + worker.ID + " shift:" + Year + "/" + Month + "/" + Day + " " + startHour + ":" + startMin + "  --->  " + endHour + ":" + endMin, cal);
 
@@ -138,18 +145,23 @@ public class Manager extends Staff {
                                 if (tempShiftDay.endTime.get(Calendar.HOUR_OF_DAY) == oldEndHour)
                                     if (tempShiftDay.endTime.get(Calendar.MINUTE) == oldEndMin) {
                                         day = tempShiftDay;
+                                        day.day.set(Year, Month, Day);
+                                        day.startTime.set(0, 0, 0, startHour, startMin);
+                                        day.endTime.set(0, 0, 0, endHour, endMin);
                                         break outer;
                                     }
         }
         if(!worker.CheckCompliance()){
+            day.day.set(oldYear, oldMonth, oldDay);
+            day.startTime.set(0, 0, 0, oldStartHour, oldStartMin);
+            day.endTime.set(0, 0, 0, oldEndHour, oldEndMin);
             throw new UnreasonableShiftException();
-        }
-        if (day!=null) {
-            day.day.set(Year, Month, Day);
-            day.startTime.set(0, 0, 0, startHour, startMin);
-            day.endTime.set(0, 0, 0, endHour, endMin);
-            Calendar cal = Calendar.getInstance();
-            LogAction("update Shift for worker:" + worker.ID + " shift:" + Year + "/" + Month + "/" + Day + " " + startHour + ":" + startMin + "  --->  " + endHour + ":" + endMin, cal);
+        }else {
+            if (day != null) {
+                StageManager.connect.updateData("update shifts set start_time='" + startHour + ":" + startMin + "',end_time='" + endHour + ":" + endMin + "',day='" + Year + "-" + Month + "-" + Day + "' where id=" + worker.ID + " and start_time='" + oldStartHour + ":" + oldStartMin + "' and end_time='" + oldEndHour + ":" + oldEndMin + "' and day='" + oldYear + "-" + oldMonth + "-" + oldDay + "'");
+                Calendar cal = Calendar.getInstance();
+                LogAction("update Shift for worker:" + worker.ID + " shift:" + Year + "/" + Month + "/" + Day + " " + startHour + ":" + startMin + "  --->  " + endHour + ":" + endMin, cal);
+            }
         }
     }
 }

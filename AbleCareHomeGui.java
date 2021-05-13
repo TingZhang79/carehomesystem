@@ -13,7 +13,6 @@ import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.util.Calendar;
 
 public class AbleCareHomeGui extends Application {
@@ -308,6 +307,9 @@ public class AbleCareHomeGui extends Application {
         for (Nurse nurse : StageManager.ableCareHome.nurses)
             comboBox.getItems().add(nurse.ID + " " + nurse.username);
 
+        for (Doctor doctor : StageManager.ableCareHome.doctors)
+            comboBox.getItems().add(doctor.ID + " " + doctor.username);
+
         ListView dayshiftView = new ListView();
         ObservableList<String> list = FXCollections.observableArrayList();
         comboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -319,7 +321,7 @@ public class AbleCareHomeGui extends Application {
                 }
             for (Doctor doctor : StageManager.ableCareHome.doctors)
                 if ((doctor.ID + " " + doctor.username).equals(newValue)) {
-                    for (ShiftDay shiftDay : nurse.shiftDay)
+                    for (ShiftDay shiftDay : doctor.shiftDay)
                         list.add(shiftDay.day.get(Calendar.YEAR) + "/" + shiftDay.day.get(Calendar.MONTH) + "/" + shiftDay.day.get(Calendar.DAY_OF_MONTH) + " " + shiftDay.startTime.get(Calendar.HOUR_OF_DAY) + ":" + shiftDay.startTime.get(Calendar.MINUTE) + "  --->  " + shiftDay.endTime.get(Calendar.HOUR_OF_DAY) + ":" + shiftDay.endTime.get(Calendar.MINUTE));
                 }
         });
@@ -541,10 +543,9 @@ public class AbleCareHomeGui extends Application {
         }
     }
 
-    public void Login(Stage primaryStage) throws IOException {
+    public void Login(Stage primaryStage){
         this.jdb = new JdbcConnect();
         this.jdb.connect();
-//        Parent root = FXMLLoader.load(getClass().getResource("login.fxml"));
         GridPane root = new GridPane();
         root.setAlignment(Pos.CENTER);
         root.setPadding(new Insets(30, 30, 30, 30));
@@ -589,9 +590,9 @@ public class AbleCareHomeGui extends Application {
             String userType = toggleGroup.selectedToggleProperty().getValue().getUserData().toString();
             System.out.println(userType);
 //            boolean isLogin = this.jdb.boolSearch("select * from user where username='"+usernameText.getText()+"' and password='"+passwordText.getText()+"' and usertype='"+userType+"'");
-            StageManager.ableCareHome.managers.add(new Manager("manager1", "12345"));
-            StageManager.ableCareHome.nurses.add(new Nurse(1001, "nurse1", "12345"));
-            StageManager.ableCareHome.nurses.add(new Nurse(1002, "nurse2", "12345"));
+//            StageManager.ableCareHome.managers.add(new Manager(3001,"manager1", "12345"));
+//            StageManager.ableCareHome.nurses.add(new Nurse(1001, "nurse1", "12345"));
+//            StageManager.ableCareHome.nurses.add(new Nurse(1002, "nurse2", "12345"));
             Staff staff = StageManager.ableCareHome.Login(userType, usernameText.getText(), passwordText.getText());
             if (staff != null) {
                 primaryStage.close();
@@ -607,10 +608,10 @@ public class AbleCareHomeGui extends Application {
                         break;
                 }
                 try {
-                    this.manager.allocateShift(StageManager.ableCareHome.nurses.get(0), 2021, 5, 11, 8, 30, 16, 30);
-                    this.manager.allocateShift(StageManager.ableCareHome.nurses.get(0), 2021, 6, 11, 8, 30, 16, 30);
-                    this.manager.allocateShift(StageManager.ableCareHome.nurses.get(1), 2021, 5, 11, 11, 30, 15, 30);
-                    this.manager.allocateShift(StageManager.ableCareHome.nurses.get(1), 2021, 6, 11, 8, 30, 14, 30);
+//                    this.manager.allocateShift(StageManager.ableCareHome.nurses.get(0), 2021, 5, 11, 8, 30, 16, 30);
+//                    this.manager.allocateShift(StageManager.ableCareHome.nurses.get(0), 2021, 6, 11, 8, 30, 16, 30);
+//                    this.manager.allocateShift(StageManager.ableCareHome.nurses.get(1), 2021, 5, 11, 11, 30, 15, 30);
+//                    this.manager.allocateShift(StageManager.ableCareHome.nurses.get(1), 2021, 6, 11, 8, 30, 14, 30);
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }

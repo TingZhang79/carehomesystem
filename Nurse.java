@@ -2,7 +2,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 public class Nurse extends MedicalWorkers{
+    JdbcConnect connect = new JdbcConnect();
     Nurse(int id,String username,String password){
+        connect.connect();
         this.username = username;
         this.password = password;
         this.ID = id;
@@ -34,6 +36,7 @@ public class Nurse extends MedicalWorkers{
             srcbed.removePatient();
             tarbed.prescription = srcbed.prescription;
             tarbed.addPatient(patient);
+
             Calendar cal = Calendar.getInstance();
             LogAction("Nurse:" +this.ID+ " Change patient:" + patient.name+ " from bed:" + srcbed.ID+" to "+tarbed.ID,cal);
         }catch (Exception e){
